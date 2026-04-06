@@ -1,0 +1,94 @@
+include <iostream>
+using namespace std;
+
+void sortHand(int hand[], int n)
+{
+   for (int pass = 0; pass < n -1; pass++) {
+       for (int i = 0; i < n - 1 - pass; i++) {
+          if (hand[i] > hand[i + 1]) {
+             int temp = hand[i]; //copy val1 in hand[i] (pos 0) to temp
+             hand[i] = hand[i + 1]; //val2 in hand[i+1](pos 1) -> store in hand[i]
+             /* memory at this point {val2, val2,val3,val4,val5} */
+             hand[i + 1] = temp;//now store temp = val1 in pos 1
+          }
+       }
+   }
+}
+//Because the array is sorted we can correcty do the following
+bool isPair(int hand[]) /* a,a,b,c,d */ {
+    for (int i = 0; i < 4; i++) {
+        if (hand[i] == hand[i + 1])
+            return true;
+    }
+    return false;
+}
+
+bool isTwoPair(int hand[]) {
+    return (hand[0] == hand[1] && hand[2] == hand[3]) || (hand[0] == hand[1] && hand[3] == hand[4]) || (hand[1] == hand[2] && hand[3] == hand[4]);
+}
+
+bool isThreeofKind(int hand[]) {
+    for (int i = 0; i < 3; i++) {
+        if(hand[i] == hand[i + 1] && hand[i] == hand[i + 2])
+            return true;
+    }
+    return false;
+}
+
+bool isFourofKind(int hand[])  {
+    return (hand[0] == hand[3] || hand[1] == hand[4]);
+}
+
+bool isStraight(int hand[])  {
+    for (int i = 0; i < 4; i++) {
+        if (hand[i + 1] != hand[i] + 1)
+            return false;
+    }
+    return true;
+}
+bool isFullHouse(int hand[]) {
+    return (hand[0] == hand[1] && hand[1] == hand[2] && hand[3] == hand[4]) || (hand[0] == hand[1] && hand[2] == hand[3] && hand[3] == hand[4]);
+}
+
+
+int main() {
+    
+    int hand[5];
+    std::cout << "Enter five numberic cards, no face card. Use 2 -9"<< std::endl; 
+
+    for (int i = 0; i < 5; i++) {
+       std::cout << "Card # " << i + 1 << ": ";
+       std::cin >> hand[i];
+
+       while(hand[i] < 2 || hand[i] > 9) {
+           std::cout << " Must be between 2-9: ";
+           std::cin >> hand[i];
+       }
+    }
+    sortHand(hand, 5);
+    if (isFourofKind(hand))
+        std::cout << "Four of a Kind\n" << std::endl;
+    else if (isFullHouse(hand))
+        std::cout << "Full House!\n" << std::endl;
+    else if (isThreeofKind(hand))
+        std::cout << "Three of a Kind\n" << std::endl;
+    else if (isStraight(hand))
+        std::cout << "You have Straight\n" << std::endl;
+    else if (isTwoPair(hand))
+        std::cout << "Two Pair\n" << std::endl;
+    else if (isPair(hand))
+        std::cout << "You have a Pair\n" << std::endl;
+    else 
+        std::cout << "High Card\n";
+    return 0;
+}
+
+/* ./PokerHandsFinal 
+Enter five numberic cards, no face card. Use 2 -9
+Card # 1: 8
+Card # 2: 7
+Card # 3: 4
+Card # 4: 5
+Card # 5: 6
+You have Straight
+*/
