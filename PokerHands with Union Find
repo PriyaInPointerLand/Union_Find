@@ -1,0 +1,115 @@
+
+#include <iostream>
+using namespace std;
+
+struct UnionFind {
+    int parent[5];
+    int size[5];
+
+    void init() {
+        for (int i = 0; i < 5; i++)
+        {
+            parent[i] = i;
+            size[i] = 1;
+        }
+    }
+
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]); //Path Compression
+        return parent[x];
+    }
+    void unite(int a, int b) {
+        int rootA = find(a);
+        int rootB = find(b);
+
+        if(rootA == rootB) return;
+        //weighted unions
+        if(size[rootA] < size[rootB]) {
+            parent[rootA] = rootB;
+            size[rootB] += size[rootA];
+        } else {
+            parent[rootB] = rootA;
+            size[rootA] += size[rootB];
+        }
+    }
+};
+
+//Union Indices whose values match
+void buildComponents(int hand[], UnionFind &uf) {
+    for (int i = 0; i < 5; i++) {
+        for (int j = i + 1; j < 5; j++)
+        {
+            if (hand[i] == hand[j])
+            {
+                uf.unite(i,j);
+            }
+        }
+    }
+}
+
+//extracting partions count how many nodes belong to each root
+void extractPartition(UnionFind &uf, int blocks[], int &count)
+{
+    int tempSizes[5] = {0};
+    for (int i = 0; i < 5; i++)
+    {
+        int root = uf.find(i);
+        tempSizes[root]++ ;
+    }
+    count = 0;
+    for (int i = 0; i < 5; i++)
+    {
+        if (tempSizes[i] > 0 )
+        {
+            blocks[count++] = tempSizes[i];
+        }
+    }
+}
+
+//sort Block sizes in Descending order
+void sortDesc(int arr[], int n) {
+    for (int p = 0; p < n - 1; p++) {
+        for(int i = 0; i < n - 1 - p; i++) {
+            if(arr[i] < arr[i+1]) {
+                int t = arr[i];
+                arr[i] = arr[i+1];
+                arr[i+1] = t;
+            }
+        }
+    }
+}
+
+//Classify Partition
+string classify(int blocks[], int count)
+{
+    if (blocks[0] == 4) return "Four of a kind";
+    if (blocks[0] == 3 && blocks[1] == 2) return "Full House";
+    if (blocks[0] == 3) return "Three of a kind";
+    if (blocks[0] == 2 && blocks[1] == 2) return "Two pair";
+    if (blocks[0] == 2) return "One Pair";
+    if (count == 5) return "High Card";
+    return "Unknown";
+}
+
+int main()
+{
+    int hand[5];
+    std::cout << "Enter five values between 2-9\n";
+    for (int i = 0; i < 5; i++)
+        std::cin >> hand[i];
+    UnionFind uf;
+    uf.init();
+
+    buildComponents(hand, uf);
+
+    int blocks[5];
+    int count;
+
+    extractPartition(uf, blocks, count);
+    sortDesc(blocks, count);
+
+    std::cout << classify(blocks, count) << std::endl;
+    return 0;
+}
+
